@@ -23,20 +23,22 @@ using NsTools.NetWork.ClientServer;
 using NsTools.Tests;
 using NsTools.Tests.Logic;
 using NsTools.Os.ConfigsOS.Implementation;
+using NsTools.Online;
 
 namespace NsTools
 {
     class Program
     {
-
-
-
         public static void Main()
         {
-            PowerSupply Psupply = new PowerSupply();
-            Initializing Init = new Initializing();
-            Connectivity Connect = new Connectivity();
+        // PowerSupply Psupply = new PowerSupply();
+        // Initializing Init = new Initializing();
+        // Connectivity Connect = new Connectivity();
+            Download Downs
+            = new Download("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BD85AABE3-C608-87E7-D6EC-56D3AD533308%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dtrue%26ap%3Dx64-stable-statsdef_0%26brand%3DGCEB/dl/chrome/install/GoogleChromeEnterpriseBundle64.zip", @"C:\Users\marcus\Downloads\chrome.zip");
 
+
+            //Console.WriteLine(Connect.Ipv6Cia(false));
 
 
             //  Init.Run("LocalMachine"
@@ -67,14 +69,9 @@ namespace NsTools
             // NetworkConnection net = new NetworkConnection();
 
             //REGISTERING A EXECUTABLE TO RUN WHEN WINDOWS IS LOADING
-            System.Console.WriteLine(Connect.RemoteConnection("LocalMachine"
-                , @"SYSTEM\ControlSet001\Control\Terminal Server"
-                , "fDenyTSConnections"
-                , @"0"
-                , RegistryValueKind.DWord, "love"));
 
 
-
+            //     Connect.RemoteConnection(true);
 
         }
 

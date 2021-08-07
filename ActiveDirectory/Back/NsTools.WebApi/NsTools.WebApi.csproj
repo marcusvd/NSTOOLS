@@ -12,5 +12,9 @@
     <ProjectReference Include="..\NsTools.Domain\NsTools.Domain.csproj" />
     <ProjectReference Include="..\NsTools.Repository\NsTools.Repository.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Reference Include="System.DirectoryServices">
+      <HintPath>..\libraries\System.DirectoryServices.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

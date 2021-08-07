@@ -11,7 +11,6 @@ namespace NsTools.Os.ConfigsOS.Implementation
 
     public class Connectivity : IConnectivity
     {
-
         HelpersConfigsOS Helpers = new HelpersConfigsOS();
         public bool Firewall(bool onOff)
         {
@@ -37,40 +36,93 @@ namespace NsTools.Os.ConfigsOS.Implementation
             }
             return true;
         }
-
-        public string[] Ipv6Cia(bool onOff)
+        public bool Ipv6Cia(bool onOff)
         {
-            // Disable-NetAdapterBinding -Name $Adapters.Name -ComponentID $Protocol -ErrorAction SilentlyContinue
-            return Helpers.HardwareQueryMany("SELECT * FROM Win32_NetworkAdapter WHERE NetEnabled = 'TRUE'", "SystemName").ToArray();
+            string NetAdapterName = Helpers.HardwareQuerySingle("SELECT * FROM Win32_NetworkAdapter WHERE NetEnabled = 'TRUE'", "NetConnectionID");
+            List<string> protocols = new List<string>();
+            protocols.Add("ms_tcpip6");
+            protocols.Add("ms_rspndr");
+            protocols.Add("ms_lltdio");
+            protocols.Add("ms_lldp");
 
+            protocols.ForEach((item) =>
+                 {
+                     if (onOff)
+                     {
+                         Helpers.Run("powershell", "Enable-NetAdapterBinding -Name " + GetActiveNetAdapterName() + " -ComponentID " + item);
+                     }
+                     else
+                     {
+                         Helpers.Run("powershell", "Disable-NetAdapterBinding -Name " + GetActiveNetAdapterName() + " -ComponentID " + item);
+                     }
+                 });
+            return true;
         }
-        public string Tests()
+        public string GetActiveNetAdapterName()
         {
-            // Disable-NetAdapterBinding -Name $Adapters.Name -ComponentID $Protocol -ErrorAction SilentlyContinue
-            // return Helpers.HardwareQueryMany("SELECT * FROM Win32_NetworkAdapter WHERE NetEnabled = 'TRUE'", "SystemName").ToArray();
-            return Helpers.HardwareQuerySingle("SELECT * FROM Win32_NetworkLoginProfile WHERE Persistent = 'TRUE'", "LocalName");
+            return Helpers.HardwareQuerySingle
+            ("SELECT * FROM Win32_NetworkAdapter WHERE NetEnabled = 'TRUE'", "NetConnectionID");
         }
-
-        public bool RemoteConnection(string baseRegistry, string registryPath, string propertyName, string volumeName, RegistryValueKind registryValueKind, string love)
+        public bool RemoteConnection(bool onOff)
         {
-
-           try
+            if (onOff)
             {
-                HelpersConfigsOS Helpers = new HelpersConfigsOS(baseRegistry,
-                registryPath,
-                propertyName,
-                volumeName,
-                registryValueKind, love);
-                
-                Helpers.WriteReg("dword");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
 
-           
+                try
+                {
+                    //Enable diasable rdp
+                    HelpersConfigsOS OnOff = new HelpersConfigsOS("LocalMachine"
+                    , @"SYSTEM\ControlSet001\Control\Terminal Server"
+                    , "fDenyTSConnections"
+                    , @"0"
+                    , RegistryValueKind.DWord, "love");
+
+                    //Enable Cript
+                    HelpersConfigsOS Cript = new HelpersConfigsOS("LocalMachine"
+                    , @"SYSTEM\ControlSet001\Control\Terminal Server\WinStations\RDP-Tcp"
+                    , "UserAuthentication"
+                    , @"0"
+                    , RegistryValueKind.DWord, "love");
+
+                    OnOff.WriteReg("dword");
+                    Cript.WriteReg("dword");
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+
+
+            }
+            else
+            {
+                try
+                {
+                    //Enable diasable rdp
+                    HelpersConfigsOS OnOff = new HelpersConfigsOS("LocalMachine"
+                    , @"SYSTEM\ControlSet001\Control\Terminal Server"
+                    , "fDenyTSConnections"
+                    , @"1"
+                    , RegistryValueKind.DWord, "love");
+
+                    //Enable Cript
+                    HelpersConfigsOS Cript = new HelpersConfigsOS("LocalMachine"
+                    , @"SYSTEM\ControlSet001\Control\Terminal Server\WinStations\RDP-Tcp"
+                    , "UserAuthentication"
+                    , @"1"
+                    , RegistryValueKind.DWord, "love");
+
+                    OnOff.WriteReg("dword");
+                    Cript.WriteReg("dword");
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+
+            }
         }
     }
 }
